@@ -11,6 +11,7 @@ export class DatingSimulation {
       seriousPct: config.seriousPct ?? 40,
       joinChance: config.joinChance ?? 0.12,
       connectChance: config.connectChance ?? 0.28,
+      friendTargetDegree: config.friendTargetDegree ?? 3,
     };
 
     this.graph = new jsnx.Graph();
@@ -81,12 +82,20 @@ export class DatingSimulation {
   _seedFriendships() {
     ['male', 'female'].forEach((gender) => {
       const ids = this._activeIdsByGender(gender);
-      ids.forEach((id) => {
-        const candidates = ids.filter((otherId) => otherId !== id);
-        const picks = pickRandom(candidates, 3);
-        picks.forEach((friendId) => this._link(id, friendId, 'friend'));
-      });
+      const p = this._friendProbability(ids.length);
+
+      for (let i = 0; i < ids.length; i += 1) {
+        for (let j = i + 1; j < ids.length; j += 1) {
+          if (Math.random() < p) this._link(ids[i], ids[j], 'friend');
+        }
+      }
     });
+  }
+
+  _friendProbability(groupSize) {
+    if (groupSize <= 1) return 0;
+    const targetDegree = Math.max(0, Number(this.config.friendTargetDegree) || 0);
+    return Math.min(1, targetDegree / (groupSize - 1));
   }
 
   _link(a, b, type) {
@@ -171,7 +180,10 @@ export class DatingSimulation {
     this.stats.joined += 1;
 
     const sameGender = this._activeIdsByGender(gender).filter((n) => n !== id);
-    pickRandom(sameGender, 3).forEach((friendId) => this._link(id, friendId, 'friend'));
+    const p = this._friendProbability(sameGender.length + 1);
+    sameGender.forEach((friendId) => {
+      if (Math.random() < p) this._link(id, friendId, 'friend');
+    });
   }
 
   step() {
@@ -215,13 +227,6 @@ export class DatingSimulation {
       },
     };
   }
-}
-
-function pickRandom(list, count) {
-  if (list.length <= count) return [...list];
-  const copy = [...list];
-  shuffle(copy);
-  return copy.slice(0, count);
 }
 
 function shuffle(array) {
