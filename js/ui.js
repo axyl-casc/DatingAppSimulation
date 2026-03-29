@@ -114,10 +114,15 @@ function renderGraph() {
   const gNodes = svg.append('g');
 
   renderSim = d3.forceSimulation(snapshot.nodes)
-    .force('link', d3.forceLink(snapshot.edges).id((d) => d.id).distance(55).strength(0.45))
-    .force('charge', d3.forceManyBody().strength(-130))
+    .force('link', d3.forceLink(snapshot.edges).id((d) => d.id).distance(78).strength(0.42))
+    .force('charge', d3.forceManyBody().strength(-185))
     .force('center', d3.forceCenter(width / 2, height / 2))
-    .force('collision', d3.forceCollide().radius(12));
+    .force('collision', d3.forceCollide().radius(16))
+    .force(
+      'x',
+      d3.forceX((d) => (d.gender === 'female' ? width * 0.28 : width * 0.72)).strength(0.18),
+    )
+    .force('y', d3.forceY(height / 2).strength(0.04));
 
   const links = gEdges
     .selectAll('line')
