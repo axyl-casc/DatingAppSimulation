@@ -5,6 +5,7 @@ const simPanel = document.getElementById('sim-panel');
 const setupForm = document.getElementById('setup-form');
 const toggleRunBtn = document.getElementById('toggle-run');
 const stepOnceBtn = document.getElementById('step-once');
+const fitViewBtn = document.getElementById('fit-view');
 const resetBtn = document.getElementById('reset');
 const speedRange = document.getElementById('speedRange');
 const speedLabel = document.getElementById('speedLabel');
@@ -15,6 +16,11 @@ let simulation;
 let timer;
 let running = false;
 let renderSim;
+let zoomBehavior;
+let currentTransform = d3.zoomIdentity;
+let graphViewport;
+let gEdges;
+let gNodes;
 
 setupForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -33,6 +39,7 @@ setupForm.addEventListener('submit', (event) => {
   simPanel.classList.remove('hidden');
 
   renderGraph();
+  fitGraphToVisibleArea(false);
   startLoop();
 });
 
@@ -51,6 +58,11 @@ stepOnceBtn.addEventListener('click', () => {
   renderGraph();
 });
 
+fitViewBtn.addEventListener('click', () => {
+  if (!simulation || !gNodes) return;
+  fitGraphToVisibleArea(true);
+});
+
 resetBtn.addEventListener('click', () => {
   stopLoop();
   simulation = null;
@@ -58,6 +70,11 @@ resetBtn.addEventListener('click', () => {
   simPanel.classList.add('hidden');
   svg.selectAll('*').remove();
   stats.innerHTML = '';
+  graphViewport = null;
+  gEdges = null;
+  gNodes = null;
+  zoomBehavior = null;
+  currentTransform = d3.zoomIdentity;
 });
 
 speedRange.addEventListener('input', () => {
@@ -91,6 +108,46 @@ function stopLoop() {
   }
 }
 
+function initializeGraphLayers() {
+  svg.selectAll('*').remove();
+
+  graphViewport = svg.append('g').attr('class', 'graph-viewport');
+  gEdges = graphViewport.append('g').attr('class', 'graph-edges');
+  gNodes = graphViewport.append('g').attr('class', 'graph-nodes');
+
+  zoomBehavior = d3
+    .zoom()
+    .scaleExtent([0.2, 4])
+    .on('zoom', () => {
+      currentTransform = d3.event.transform;
+      graphViewport.attr('transform', currentTransform);
+    });
+
+  svg.call(zoomBehavior).on('dblclick.zoom', null);
+}
+
+function fitGraphToVisibleArea(animate = true) {
+  const width = Number(svg.attr('width'));
+  const height = Number(svg.attr('height'));
+  if (!width || !height || !graphViewport) return;
+
+  const bounds = graphViewport.node().getBBox();
+  if (!bounds.width || !bounds.height) return;
+
+  const padding = 36;
+  const scale = Math.max(
+    0.2,
+    Math.min(4, 0.92 / Math.max(bounds.width / (width - padding * 2), bounds.height / (height - padding * 2))),
+  );
+
+  const tx = width / 2 - scale * (bounds.x + bounds.width / 2);
+  const ty = height / 2 - scale * (bounds.y + bounds.height / 2);
+  const nextTransform = d3.zoomIdentity.translate(tx, ty).scale(scale);
+
+  const target = animate ? svg.transition().duration(350) : svg;
+  target.call(zoomBehavior.transform, nextTransform);
+}
+
 function renderGraph() {
   const snapshot = simulation.getSnapshot();
 
@@ -108,10 +165,10 @@ function renderGraph() {
     <div class="stat-pill">Friend-match violations: ${snapshot.metrics.friendMatchViolations}</div>
   `;
 
-  svg.selectAll('*').remove();
+  if (!graphViewport) initializeGraphLayers();
 
-  const gEdges = svg.append('g');
-  const gNodes = svg.append('g');
+  gEdges.selectAll('*').remove();
+  gNodes.selectAll('*').remove();
 
   renderSim = d3.forceSimulation(snapshot.nodes)
     .force('link', d3.forceLink(snapshot.edges).id((d) => d.id).distance(78).strength(0.42))
