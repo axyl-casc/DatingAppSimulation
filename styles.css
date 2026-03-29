@@ -1,0 +1,174 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --text: #1e2430;
+  --male: #4c78ff;
+  --female: #ff5ea8;
+  --friend: #8d99ae;
+  --match: #f7a531;
+  --dating: #2bb673;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+header {
+  padding: 1rem 1.5rem;
+  background: #121828;
+  color: #fff;
+}
+
+main {
+  padding: 1rem 1.5rem 6rem;
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.hidden {
+  display: none;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  gap: 0.3rem;
+}
+
+input,
+button {
+  font: inherit;
+  padding: 0.45rem 0.5rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+
+.stat-pill {
+  background: #eef2ff;
+  border-radius: 20px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+#graph {
+  width: 100%;
+  border: 1px solid #d0d5e2;
+  border-radius: 8px;
+  background: #fafbff;
+}
+
+.legend ul {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.dot.male {
+  background: var(--male);
+}
+
+.dot.female {
+  background: var(--female);
+}
+
+.line {
+  width: 20px;
+  height: 0;
+  border-top: 3px solid;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.line.friend {
+  border-color: var(--friend);
+}
+
+.line.match {
+  border-color: var(--match);
+}
+
+.line.dating {
+  border-color: var(--dating);
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #dbe1ef;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+footer input[type='range'] {
+  flex: 1;
+}
+
+.edge-friend {
+  stroke: var(--friend);
+  stroke-dasharray: 5 3;
+}
+
+.edge-match {
+  stroke: var(--match);
+}
+
+.edge-dating {
+  stroke: var(--dating);
+  stroke-width: 2.7;
+}
+
+.node-male {
+  fill: var(--male);
+}
+
+.node-female {
+  fill: var(--female);
+}
