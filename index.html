@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dating App Network Simulation</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsnetworkx/0.3.4/jsnetworkx.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Dating App Network Simulation</h1>
+      <p>Configure populations, intentions, and watch the network evolve.</p>
+    </header>
+
+    <main>
+      <section id="setup-panel" class="panel">
+        <h2>Setup</h2>
+        <form id="setup-form">
+          <div class="form-grid">
+            <label>
+              Male population
+              <input type="number" id="maleCount" name="maleCount" min="1" value="30" required />
+            </label>
+            <label>
+              Female population
+              <input type="number" id="femaleCount" name="femaleCount" min="1" value="30" required />
+            </label>
+            <label>
+              Casual intention (%)
+              <input type="number" id="casualPct" name="casualPct" min="0" max="100" value="40" required />
+            </label>
+            <label>
+              Serious intention (%)
+              <input type="number" id="seriousPct" name="seriousPct" min="0" max="100" value="40" required />
+            </label>
+            <label>
+              Join chance per step (0-1)
+              <input type="number" id="joinChance" name="joinChance" min="0" max="1" step="0.01" value="0.12" required />
+            </label>
+            <label>
+              Connection chance per node per step (0-1)
+              <input type="number" id="connectChance" name="connectChance" min="0" max="1" step="0.01" value="0.28" required />
+            </label>
+          </div>
+          <button type="submit">Start Simulation</button>
+        </form>
+      </section>
+
+      <section id="sim-panel" class="panel hidden">
+        <div class="controls">
+          <button id="toggle-run">Pause</button>
+          <button id="step-once">Step once</button>
+          <button id="reset">Back to setup</button>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <svg id="graph" width="1100" height="650" aria-label="Dating app network graph"></svg>
+
+        <div class="legend">
+          <h3>Legend</h3>
+          <ul>
+            <li><span class="dot male"></span> Male node</li>
+            <li><span class="dot female"></span> Female node</li>
+            <li><span class="line friend"></span> Friend edge</li>
+            <li><span class="line match"></span> Match edge</li>
+            <li><span class="line dating"></span> Dating edge</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <label for="speedRange">Simulation speed</label>
+      <input id="speedRange" type="range" min="1" max="100" value="55" />
+      <span id="speedLabel">550 ms/step</span>
+    </footer>
+
+    <script type="module" src="js/ui.js"></script>
+  </body>
+</html>
